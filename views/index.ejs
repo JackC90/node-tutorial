@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col=lg-4"></div>
+  <div class="col=lg-4">
+    <% if (data.isLoggedIn){ %>
+      <h1>You are logged in as: <%= data.userName %></h1>
+    <% } %>
+    <h1>You Searched For: <%= data.userQuery %></h1>
+    <ul>
+      <% data.searchResults.forEach(result => { %>
+        <li><%= result %></li>
+      <% }) %>
+    </ul>
+  </div>
+</div>

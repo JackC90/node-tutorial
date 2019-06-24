@@ -1,43 +1,51 @@
-const Logger = require('./logger');
-const os = require('os');
-const fs = require('fs');
-const http = require('http');
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const Joi = require('joi');
+const app = express();
 
-// console.log(__filename);
-// console.log(__dirname);
-// console.log(os.freemem());
+app.use('/public', express.static(path.join(__dirname, 'static')));
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-// Asynchronous method - preferred
-// console.log(fs.readdirSync('./'));
+app.get('/', (req, res) => {
+  res.render('index');
+})
 
-// Connecting to Server
-const server = http.createServer((req, res) => {
-  if (req.url === '/') {
-    res.write('Hello World');
-    res.end();
-  }
+app.get('/form', (req, res) => {
+  res.sendFile(path.join(__dirname, 'static', 'index.html'));
+})
 
-  if (req.url === '/api/courses') {
-    res.write(JSON.stringify([1, 2, 3]));
-    res.end();
-  }
-});
+app.get('/search/:userQuery', (req, res) => {
+  res.render('index',
+    { data:
+      {
+        isLoggedIn: true,
+        userName: 'John Snow',
+        userQuery: req.params.userQuery,
+        searchResults: [
+          'book1', 'book2', 'book3',
+        ]
+      }
+    })
+})
 
-server.on('connection', (socket) => {
-  console.log('New connection...')
-});
+app.post('/', (req, res) => {
+  console.log(req.body);
+  const schema = Joi.object().keys({
+    email: Joi.string().trim().email().required(),
+    password: Joi.string().min(5).max(10).required()
+  });
+  Joi.validate(req.body, schema, (err, result) => {
+    if (err) {
+      console.log(err);
+      res.json(err.details);
+    }
+  })
+  // Database work
 
-server.listen(3000);
-console.log('Listening on port 3000...');
+  // res.json({ success: true });
+})
 
-// Calling a class, and using emitter
-const logger = new Logger();
-
-// Register a listener
-logger.on('messageLogged', (arg) => {
-  console.log('Listener called', arg);
-});
-
-logger.log('Hello, I\' logged!');
-
-
+app.listen(3000);

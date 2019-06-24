@@ -1,0 +1,48 @@
+<html>
+  <body>
+    <div>
+      <form action="/" method="POST" id="form">
+        <div class="form-group">
+          <label for="email">Email address:</label>
+          <input type="email" class="form-control" name="email" />
+        </div>
+        <div class="form-group">
+          <label for="pwd">Password:</label>
+          <input type="password" class="form-control" name="password" />
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous">
+    </script>
+
+    <script>
+      const serializeJSON = ($form) => {
+        return $form.serializeArray().reduce((obj, current) => {
+          obj[current.name] = current.value;
+          return obj;
+        }, {});
+      };
+
+      $(document).ready(() => {
+        $('#form').submit((e) => {
+          e.preventDefault();
+          $.ajax({
+            url: '/',
+            type: 'post',
+            contentType: 'application/json',
+            data: JSON.stringify(serializeJSON($('#form'))),
+            success: (response) => {
+              console.log('successfully sent response');
+              console.log(response)
+            }
+          })
+        })
+      })
+    </script>
+  </body>
+</html>
